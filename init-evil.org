@@ -1,0 +1,56 @@
+#+title: Evil Emacs
+#+author: Olivier Brunet
+#+email: olibrunet@free.fr
+#+property: header-args:elisp :tangle ~/.emacs.d/elisp/init-evil.el
+#+property: header-args:elisp :results silent :eval no-export :comments org
+
+Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-evil.org][emacs-evil.org]] d'Howard Abrams
+
+* Evil Emacs
+
+  Un bon point de départ est [[https://blog.aaronbieber.com/2016/01/23/living-in-evil.html][Living in Evil]] qui explique comment utiliser le meilleur de Vi et d'Emacs grâce à Evil.
+
+** Evil Mode
+
+   #+begin_src elisp
+     (use-package evil
+       :straight t
+       :config
+       (evil-mode 1)
+       )
+   #+end_src
+
+* Compléments
+
+** Googles
+
+Le mode [[https://github.com/edkolev/evil-goggles][evil-googles]] donne un aperçu des manipulations en evil.·
+
+   #+begin_src elisp
+     (use-package evil-googles
+       :straight t
+       :config
+       (evil-googles-mode)
+       )
+   #+end_src
+
+** Surround
+
+[[https://github.com/emacs-evil/evil-surround][evil-surround]] fournit des actions supplémentaires pour gérer toutes sortes de délimiteurs.
+
+#+begin_src elisp
+(use-package evil-surround
+:straight t
+:config
+(global-evil-surround-mode)
+)
+#+end_src
+
+#+RESULTS:
+: t
+
+* Maintenance
+
+  #+begin_src elisp
+    (provide 'init-evil)
+  #+end_src
