@@ -1,0 +1,33 @@
+#+title: MacOS Emacs
+#+author: Olivier Brunet
+#+email: olibrunet@free.fr
+#+property: header-args:elisp :tangle ~/.emacs.d/elisp/init-macos.el
+#+property: header-args:      :results silent  :eval no-export  :comments org
+
+Comme souvent, on part de [[https://github.com/howardabrams/dot-files/blob/master/emacs-mac.org][emacs-mac.org]] chez Howard Abrams.
+
+* Key Bindings
+
+  #+begin_src elisp
+    (setq mac-option-modifier 'meta)
+    (setq mac-command-modifier 'super)
+  #+end_src
+
+* Réglage des différents chemins
+
+  C'est un problème qui arrive lorsque l'on ne lance pas Emacs depuis le terminal, les /paths/ ne sont pas corrects.
+
+  #+begin_src elisp
+    (use-package exec-path-from-shell
+      :if (memq window-system '(mac ns))
+      :straight t
+      :config
+      (exec-path-from-shell-initialize)
+      )
+  #+end_src
+
+* Maintenance
+
+  #+begin_src elisp
+    (provide 'init-macos)
+  #+end_src

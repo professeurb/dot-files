@@ -2,9 +2,11 @@
 #+author: Olivier Brunet
 #+email: olibrunet@free.fr
 #+property: header-args:elisp :tangle ~/.emacs.d/elisp/init-evil.el
-#+property: header-args:elisp :results silent :eval no-export :comments org
+#+property: header-args:      :results silent  :eval no-export  :comments org
 
 Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-evil.org][emacs-evil.org]] d'Howard Abrams
+
+On peut lire ce [[https://github.com/noctuid/evil-guide][guide]] très très complet.
 
 * Evil Emacs
 
@@ -22,32 +24,48 @@ Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-
 
 * Compléments
 
-** Googles
+** Escape
 
-Le mode [[https://github.com/edkolev/evil-goggles][evil-googles]] donne un aperçu des manipulations en evil.·
+   [[https://github.com/syl20bnr/evil-escape][evil-escape]] permet de définir un code d'échappement pour sortir du mode d'insertion.
 
    #+begin_src elisp
-     (use-package evil-googles
+     (use-package evil-escape
+       :straight t
+       :after evil
+       :config
+       (evil-escape-mode)
+       (setq-default evil-escape-key-sequence "jk")
+       (setq-default evil-escape-unordered-key-sequence t))
+   #+end_src
+
+
+** Goggles
+
+   Le mode [[https://github.com/edkolev/evil-goggles][evil-goggles]] donne un aperçu des manipulations en evil.
+
+   #+begin_src elisp
+     (use-package evil-goggles
        :straight t
        :config
-       (evil-googles-mode)
+       (evil-goggles-mode)
        )
    #+end_src
 
 ** Surround
 
-[[https://github.com/emacs-evil/evil-surround][evil-surround]] fournit des actions supplémentaires pour gérer toutes sortes de délimiteurs.
+   [[https://github.com/emacs-evil/evil-surround][evil-surround]] fournit des actions supplémentaires pour gérer toutes sortes de délimiteurs.
 
-#+begin_src elisp
-(use-package evil-surround
-:straight t
-:config
-(global-evil-surround-mode)
-)
-#+end_src
+   #+begin_src elisp
+     (use-package evil-surround
+       :straight t
+       :config
+       (global-evil-surround-mode)
+       )
+   #+end_src
 
-#+RESULTS:
-: t
+   *** À explorer…
+
+   - [[https://github.com/cute-jumper/embrace.el][embrace]] et [[https://github.com/cute-jumper/evil-embrace.el][evil-embrace]] pour étendre les possibilités de délimiteurs (voir [[https://github.com/emacs-evil/evil-surround/issues/95][ici]]).
 
 * Maintenance
 

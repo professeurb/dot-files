@@ -1,0 +1,61 @@
+#+title: Python Emacs
+#+author: Olivier Brunet
+#+email: olibrunet@free.fr
+#+property: header-args:elisp :tangle ~/.emacs.d/elisp/init-python.el
+#+property: header-args:      :results silent  :eval no-export  :comments org
+
+On peut lire avec intérêt [[https://github.com/howardabrams/dot-files/blob/master/emacs-python.org][emacs-python.org]] d'Howard Abrams, ainsi que [[https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a][Managing a Python development environment in Emacs]].
+
+#+begin_src elisp
+  (use-package elpy
+    :straight t
+    :init
+    (elpy-enable)
+    ;; (setq python-shell-interpreter "jupyter-console"
+    ;; 	python-shell-interpreter-args "--simple-prompt"
+    ;; 	python-shell-prompt-detect-failure-warning nil)
+    ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+    ;; 	       "jupyter-console")
+    ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+    ;; 	       "jupyter")
+    :custom
+    (elpy-shell-codecell-beginning-regexp (concat "^\\(?:"
+						  "##.*"
+						  "\\|"
+						  "#\\s-*<codecell>"
+						  "\\|"
+						  "#\\s-*In\\[.*\\]:"
+						  "\\|"
+						  "#[:blank:]*%%"
+						  "\\)\\s-*$") "")
+    (elpy-shell-cell-boundary-regexp (concat "^\\(?:"
+					     "##.*" "\\|"
+					     "#\\s-*<.+>" "\\|"
+					     "#\\s-*\\(?:In\\|Out\\)\\[.*\\]:"
+					     "\\|"
+					     "#[:blank:]*%%"
+					     "\\)\\s-*$") "")
+    :hook (
+	   (elpy-mode . flycheck-mode)
+	   ;; (pyenv-mode . elpy-rpc-restart)
+	   )
+    :config
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
+
+  (use-package blacken
+    :straight t
+    :hook (python-mode . blacken-mode)
+    :config (setq blacken-line-length '80)
+    :bind (:map python-mode-map ([remap indent-region] . blacken)))
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  ;; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
+  (setq elpy-shell-echo-output nil)
+  (setq elpy-rpc-python-command "python3")
+  (setq elpy-rpc-timeout 2)
+
+  ;; (use-package jupyter :straight t)
+#+end_src
+
+#+begin_src elisp
+(provide 'init-python)
+#+end_src

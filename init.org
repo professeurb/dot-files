@@ -1,7 +1,7 @@
 #+title: Professeur B's configuration
 #+options: toc:4 h:4
 #+startup: showeverything
-#+property: header-args:emacs-lisp :tangle "~/.emacs.d/init.el"
+#+property: header-args:elisp :tangle "~/.emacs.d/init.el"
 #+property: header-args: :results silent :eval no-export :comments org
 
 * Introduction
@@ -16,7 +16,23 @@
   - [[https://github,com/purcell/emacs.d][Steve Purcell]]
   - [[https://github.com/howardabrams/dot-files][Howard Abrams]]
 
-  #+begin_src emacs-lisp
+  #+begin_src elisp
+    (defconst profb/emacs-directory (concat (getenv "HOME") "/.emacs.d/"))
+
+    (defun profb/emacs-subdirectory (d) (expand-file-name d profb/emacs-directory))
+    (let* ((subdirs '("elisp" "backups"))
+	   (fulldirs (mapcar (lambda (d) (profb/emacs-subdirectory d)) subdirs)))
+      (dolist (dir fulldirs)
+	(when (not (file-exists-p dir))
+	  (message "Make directory: %s" dir)
+	  (make-directory dir))))
+    (setq custom-file (expand-file-name "custom.el" profb/emacs-directory))
+    (when (file-exists-p custom-file)
+      (load custom-file))
+    (add-to-list 'load-path (profb/emacs-subdirectory "elisp"))
+  #+end_src
+
+  #+begin_src elisp
     ;; Minimal UI
     (scroll-bar-mode -1)
     (tool-bar-mode   -1)
@@ -24,10 +40,7 @@
     (menu-bar-mode   -1)
     (setq inhibit-startup-screen t)
     (setq initial-scratch-message nil)
-
-    ;; OsX stuff
-    (setq mac-option-modifier 'none)
-    (setq mac-command-modifier 'meta)
+    (setq visible-bell t)
 
     ;; Line truncation
     (setq-default truncate-lines nil)
@@ -60,20 +73,12 @@
 
   #+end_src
     
-* Things to do
-** TODO Startup screen
-** TODO Python mode, lots of things to do
-** TODO Html export
-*** TODO We need style
-
 * Package installation
-
-  Essai avec src_python[:exports code]{1 + fibo(10)} src_sh[:exports code]{echo -e "test"}.
 
 ** Package management initialisation
 
    We require the =package= package, declare some repositories and initialize it.
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (require 'package)
 
      (add-to-list 'package-archives
@@ -82,12 +87,14 @@
 		  '("melpa" . "https://melpa.org/packages/") t)
      (add-to-list 'package-archives
 		  '("org" . "https://orgmode.org/elpa/") t)
+     (add-to-list 'package-archives
+		  '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
      (package-initialize)
    #+end_src
 
    Next, we install [[https://github.com/raxod502/straight.el#bootstrapping-straightel][straight]] and [[https://github.com/jwiegley/use-package][use-package]] and get it ready to use.
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      (defvar bootstrap-version)
      (let ((bootstrap-file
 	    (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -112,93 +119,138 @@
    #+end_src
 
    We make sure to install packages if needed.
-   #+begin_src emacs-lisp
+   #+begin_src elisp
      ;; (require 'use-package-ensure)
      ;; (setq use-package-always-ensure t)
    #+end_src
 
    # We assign key =C-y= to yank (i.e. paste). It uses a function defined in =use-package=.
-   # #+begin_src emacs-lisp
+   # #+begin_src elisp
    # (bind-key* "<C-y>" 'yank)
    # #+end_src
 
 ** Packages and configuration
 
 *** Utility packages
-    * [[https://github.com/purcell/exec-path-from-shell/tree/81125c5adbc903943c016c2984906dc089372a41][exec-path-from-shell]]
-    #+begin_src emacs-lisp
-      (use-package exec-path-from-shell
-	:if (memq window-system '(mac ns))
-	:straight t
-	:config
-	(exec-path-from-shell-initialize)
-	)
+    #+begin_src elisp
+      (require 'init-macos)
     #+end_src
     * [[https://github.com/myrjola/diminish.el][diminish]] provides lighter displays of minor-modes.
-    #+begin_src emacs-lisp
-      (use-package diminish :straight t)
-    #+end_src
+      #+begin_src elisp
+	(use-package diminish :straight t)
+      #+end_src
     - [[https://github.com/justbur/emacs-which-key][whick-key]] makes it easier to discover Emacs key presses. 
-    #+begin_src emacs-lisp
-      (use-package which-key
-	:straight t
-	:diminish which-key-mode
-	:config
-	(setq which-key-separator " ")
-	(setq which-key-prefix-prefix "+")
-	(setq which-key-idle-delay 0.05)
-	(which-key-setup-side-window-bottom)
-	(which-key-mode)
-	)
-      ;; Recent Files
-      (use-package recentf
-	:straight t
-	:config
-	(setq recentf-auto-cleanup 'never) ;; prevent issues with Tramp
-	(setq recentf-max-saved-items 100)
-	(setq recentf-max-menu-items 15)
-	(recentf-mode t))
-      (use-package hydra
-	:straight (:host github :repo "abo-abo/hydra"))
-      (use-package major-mode-hydra
-	:straight t
-	:bind
-	("M-SPC" . major-mode-hydra))
-    #+end_src
-    - a pdf viewer
-    #+begin_src emacs-lisp
-      (use-package pdf-tools :straight t)
-    #+end_src
+      #+begin_src elisp
+	(use-package which-key
+	  :straight t
+	  :diminish which-key-mode
+	  :config
+	  (setq which-key-separator " ")
+	  (setq which-key-prefix-prefix "+")
+	  (setq which-key-idle-delay 0.05)
+	  (which-key-setup-side-window-bottom)
+	  (which-key-mode)
+	  )
+	;; Recent Files
+	;; (use-package recentf
+	;;   :straight t
+	;;   :config
+	;;   (setq recentf-auto-cleanup 'never) ;; prevent issues with Tramp
+	;;   (setq recentf-max-saved-items 100)
+	;;   (setq recentf-max-menu-items 15)
+	;;   (recentf-mode t))
+	(use-package hydra
+	  :straight (:host github :repo "abo-abo/hydra"))
+	(use-package major-mode-hydra
+	  :straight t
+	  :bind
+	  ("M-SPC" . major-mode-hydra))
+      #+end_src
+
+**** Gestion des fenêtres
+
+     #+begin_src elisp
+       (use-package ace-window
+	 :straight t
+	 :diminish ace-window-mode
+	 :init
+	 ;; (setq aw-keys '(?a ?s ?d ?f ?j ?k ?l ?o))
+	 (global-set-key (kbd "C-x o") 'ace-window)
+	 )
+     #+end_src
+
+**** Undo et Redo
+
+     On utilise [[http://www.dr-qubit.org/undo-tree.html][undo-tree]].
+
+     #+begin_src elisp
+       (use-package undo-tree
+	 :straight t
+	 :diminish undo-tree-mode
+	 :init
+	 (global-undo-tree-mode 1)
+	 :config
+	 (defalias 'redo 'undo-tree-redo)
+	 :bind (("C-z" . undo)     ; Zap to character isn't helpful
+		("C-S-z" . redo)))
+     #+end_src
+     
+**** IDO
+
+     Voir [[https://www.masteringemacs.org/article/introduction-to-ido-mode][ici]] pour être convaincu par /Interactive Do Things/.
+
+     #+begin_src elisp
+       (use-package ido
+	 :straight t
+	 :init  (setq ido-enable-flex-matching t
+		      ido-ignore-extensions t
+		      ido-use-virtual-buffers t
+		      ido-everywhere t)
+	 :config
+	 (ido-mode 1)
+	 (ido-everywhere 1)
+	 )
+     #+end_src
+
+     Pour faire marcher IDO verticallement, on peut utiliser [[https://github.com/creichert/ido-vertical-mode.el][ido-vertical-mode]].
+ 
+     #+begin_src elisp
+       (use-package ido-vertical-mode
+	 :ensure t
+	 :init               ; I like up and down arrow keys:
+	 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+	 :config
+	 (ido-vertical-mode 1))
+     #+end_src
+
 *** [[https://github.com/emacs-lsp/lsp-mode][Language Server Protocol]]
 
     - [[https://emacs-lsp.github.io/lsp-mode/lsp-mode.html][Documentation]]
 
-    #+begin_src emacs-lisp
-      (setq lsp-keymap-prefix "C-l")
-      (use-package lsp-mode
-	:straight t
-	:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-	       ;; (ocaml-mode . lsp-deferred)
-	       ;; (python-mode . lsp-deferred)
-	       ;; if you want which-key integration
-	       (lsp-mode . lsp-enable-which-key-integration))
-	:commands lsp)
+    # #+begin_src elisp
+    #   (setq lsp-keymap-prefix "C-l")
+    #   (use-package lsp-mode
+    # 	:straight t
+    # 	:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+    # 	       ;; (ocaml-mode . lsp-deferred)
+    # 	       ;; (python-mode . lsp-deferred)
+    # 	       ;; if you want which-key integration
+    # 	       (lsp-mode . lsp-enable-which-key-integration))
+    # 	:commands lsp)
 
-      ;; optionally
-      (use-package lsp-ui :straight t :commands lsp-ui-mode)
-      (use-package company-lsp :straight t :commands company-lsp)
-      ;; if you are helm user
-      ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-      ;; if you are ivy user
-      (use-package lsp-ivy :straight t :commands lsp-ivy-workspace-symbol)
-      ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-    #+end_src
-
-    #+RESULTS:
+    #   ;; optionally
+    #   (use-package lsp-ui :straight t :commands lsp-ui-mode)
+    #   (use-package company-lsp :straight t :commands company-lsp)
+    #   ;; if you are helm user
+    #   ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+    #   ;; if you are ivy user
+    #   (use-package lsp-ivy :straight t :commands lsp-ivy-workspace-symbol)
+    #   ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+    # #+end_src
 
 *** Auto-completion with [[http://company-mode.github.io][company]]
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package company
 	:straight t
 	:diminish (company-mode . " ⓐ")
@@ -215,7 +267,7 @@
 
 *** Snippets
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package yasnippet
 	:straight t
 	:config
@@ -224,32 +276,20 @@
 	(yas-global-mode))
       (use-package yasnippet-snippets :straight t)
     #+end_src
- 
+
 *** Evil mode
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package evil-leader
 	:straight t
 	:config
 	(global-evil-leader-mode)
 	(evil-leader/set-leader "<SPC>"))
 
-      (use-package evil
-	:straight t
-	:config
-	(evil-mode 1)
-	)
+      (require 'init-evil)
     #+end_src
 
-    #+begin_src emacs-lisp
-      (use-package evil-escape
-	:straight t
-	:after evil
-	:config
-	(evil-escape-mode)
-	(setq-default evil-escape-key-sequence "jk")
-	(setq-default evil-escape-unordered-key-sequence t))
-
+    #+begin_src elisp
       (use-package evil-commentary
 	:straight t
 	:after evil
@@ -259,19 +299,11 @@
       (use-package evil-indent-plus
 	:straight t
 	:after evil)
-
-      (use-package evil-surround
-	:straight t
-	:after evil
-	:config
-	(global-evil-surround-mode))
     #+end_src
 
     What do we have here?
-    - [[https://github.com/syl20bnr/evil-escape/][evil-escape]] which allows to escape to normal mode in many modes,
     - [[https://github.com/linktohack/evil-commentary/][evil-commentary]] which helps commenting out things (=gcc= comments a line, =gc= comments out the target motion),
     - [[https://github.com/TheBB/evil-indent-plus/][evil-indent-plus]] adds textobjects based on indentation, =i= corresponding to same or higher indentation, =I= to include the first line with less indentation and =J= to also include an extra line below,
-    - [[https://github.com/emacs-evil/evil-surround/][evil-surround]] which provides many textobjects based on surrounding characters.
 
     It might be interesting to take a look at:
     - [[https://github.com/emacs-evil/evil-collection/][evil-collection]]
@@ -279,7 +311,7 @@
 
     Now, let's define some hydras
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (pretty-hydra-define mydra-buffer () ("Buffers"
 					    ( ("b" list-buffers "list")
 					      ("k" kill-buffer "kill")
@@ -304,7 +336,7 @@
 
     I use [[https://github.com/hlissner/emacs-doom-themes/trees/][emacs-doom-themes]].
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package doom-themes
 	:ensure t
 	:config
@@ -323,7 +355,7 @@
 	:config (load-theme 'nord t))
     #+end_src
     Setup [[https://github.com/Fanael/rainbow-delimiters][rainbow-delimiters]] to start automatically in most programming modes.
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package rainbow-delimiters
 	:straight t
 	:hook (prog-mode . rainbow-delimiters-mode)
@@ -332,7 +364,7 @@
 	(electric-pair-mode 1))
     #+end_src
     Let's customize the OSX interface
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       ;; Fancy titlebar for MacOS
       (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
       (add-to-list 'default-frame-alist '(ns-appearance . dark))
@@ -340,7 +372,7 @@
       (setq frame-title-format nil)
     #+end_src
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package ivy
 	:straight t
 	:diminish (ivy-mode . " Ⅳ")
@@ -366,7 +398,7 @@
     #+end_src
 
     The first time, one has to run the command =all-the-icons-install-fonts=.
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package all-the-icons :straight t)
       (use-package all-the-icons-ivy
 	:straight t
@@ -378,7 +410,7 @@
 *** General packages
 
     - [[https://www.flycheck.org][Flycheck]] syntax checker
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package flycheck
 	:straight t
 	:init (global-flycheck-mode))
@@ -387,64 +419,15 @@
 *** Language specifics
     
 **** Python
-
-     Some good advice can be found [[https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a][here]].
-    
-     #+begin_src emacs-lisp
-       (use-package elpy
-	 :straight t
-	 :init
-	 (elpy-enable)
-	 ;; (setq python-shell-interpreter "jupyter-console"
-	 ;; 	python-shell-interpreter-args "--simple-prompt"
-	 ;; 	python-shell-prompt-detect-failure-warning nil)
-	 ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
-	 ;; 	       "jupyter-console")
-	 ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
-	 ;; 	       "jupyter")
-	 :custom
-	 (elpy-shell-codecell-beginning-regexp (concat "^\\(?:"
-						       "##.*"
-						       "\\|"
-						       "#\\s-*<codecell>"
-						       "\\|"
-						       "#\\s-*In\\[.*\\]:"
-						       "\\|"
-						       "#[:blank:]*%%"
-						       "\\)\\s-*$") "")
-	 (elpy-shell-cell-boundary-regexp (concat "^\\(?:"
-						  "##.*" "\\|"
-						  "#\\s-*<.+>" "\\|"
-						  "#\\s-*\\(?:In\\|Out\\)\\[.*\\]:"
-						  "\\|"
-						  "#[:blank:]*%%"
-						  "\\)\\s-*$") "")
-	 :hook (
-		(elpy-mode . flycheck-mode)
-		;; (pyenv-mode . elpy-rpc-restart)
-		)
-	 :config
-	 (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
-
-       (use-package blacken
-	 :straight t
-	 :hook (python-mode . blacken-mode)
-	 :config (setq blacken-line-length '80)
-	 :bind (:map python-mode-map ([remap indent-region] . blacken)))
-       (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-       ;; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
-       (setq elpy-shell-echo-output nil)
-       (setq elpy-rpc-python-command "python3")
-       (setq elpy-rpc-timeout 2)
-
-       (use-package jupyter :straight t)
+     #+begin_src elisp
+       (require 'init-python)
      #+end_src
 
 **** OCaml
 
      Everything has been installed using opam.
 
-     #+begin_src emacs-lisp
+     #+begin_src elisp
        (use-package caml
 	 :straight (:host github :repo "ocaml/caml-mode"))
 
@@ -465,7 +448,7 @@
 
      We use [[https://www.gnu.org/software/auctex/documentation.html][AucTeX]].
 
-     #+begin_src emacs-lisp
+     #+begin_src elisp
        ;; (use-package auctex
        ;;   :straight t
        ;; )
@@ -473,7 +456,7 @@
 
 *** Org
 
-    #+begin_src emacs-lisp
+    #+begin_src elisp
       (use-package org
 	:straight t
 	:ensure org-plus-contrib
@@ -499,6 +482,3 @@
       ;; (setq org-latex-pdf-process
       ;; '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
     #+end_src
-
-
-
