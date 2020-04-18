@@ -6,13 +6,9 @@
 
 Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-evil.org][emacs-evil.org]] d'Howard Abrams
 
-On peut lire ce [[https://github.com/noctuid/evil-guide][guide]] très très complet.
-
 * Evil Emacs
 
-  Un bon point de départ est [[https://blog.aaronbieber.com/2016/01/23/living-in-evil.html][Living in Evil]] qui explique comment utiliser le meilleur de Vi et d'Emacs grâce à Evil.
-
-** Evil Mode
+  Un bon point de départ est [[https://blog.aaronbieber.com/2016/01/23/living-in-evil.html][Living in Evil]] qui explique comment utiliser le meilleur de Vi et d'Emacs grâce à Evil. On peut aussi lire ce [[https://github.com/noctuid/evil-guide][guide]] très très complet.
 
    #+begin_src elisp
      (use-package evil
@@ -37,8 +33,7 @@ On peut lire ce [[https://github.com/noctuid/evil-guide][guide]] très très com
        (setq-default evil-escape-key-sequence "jk")
        (setq-default evil-escape-unordered-key-sequence t))
    #+end_src
-
-
+   
 ** Goggles
 
    Le mode [[https://github.com/edkolev/evil-goggles][evil-goggles]] donne un aperçu des manipulations en evil.
@@ -63,9 +58,9 @@ On peut lire ce [[https://github.com/noctuid/evil-guide][guide]] très très com
        )
    #+end_src
 
-   *** À explorer…
+*** À explorer…
 
-   - [[https://github.com/cute-jumper/embrace.el][embrace]] et [[https://github.com/cute-jumper/evil-embrace.el][evil-embrace]] pour étendre les possibilités de délimiteurs (voir [[https://github.com/emacs-evil/evil-surround/issues/95][ici]]).
+    - [[https://github.com/cute-jumper/embrace.el][embrace]] et [[https://github.com/cute-jumper/evil-embrace.el][evil-embrace]] pour étendre les possibilités de délimiteurs (voir [[https://github.com/emacs-evil/evil-surround/issues/95][ici]]).
 
 * Maintenance
 

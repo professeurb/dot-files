@@ -8,9 +8,11 @@ Comme souvent, on part de [[https://github.com/howardabrams/dot-files/blob/maste
 
 * Key Bindings
 
+  Je laisse la touche =option= inchangée car elle est nécessaire pour certains caractères avec le clavier français.
+
   #+begin_src elisp
-    (setq mac-option-modifier 'meta)
-    (setq mac-command-modifier 'super)
+    (setq mac-option-modifier 'none)
+    (setq mac-command-modifier 'meta)
   #+end_src
 
 * Réglage des différents chemins
