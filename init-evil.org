@@ -10,13 +10,13 @@ Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-
 
   Un bon point de départ est [[https://blog.aaronbieber.com/2016/01/23/living-in-evil.html][Living in Evil]] qui explique comment utiliser le meilleur de Vi et d'Emacs grâce à Evil. On peut aussi lire ce [[https://github.com/noctuid/evil-guide][guide]] très très complet.
 
-   #+begin_src elisp
-     (use-package evil
-       :straight t
-       :config
-       (evil-mode 1)
-       )
-   #+end_src
+  #+begin_src elisp
+    (use-package evil
+      :straight t
+      :config
+      (evil-mode 1)
+      )
+  #+end_src
 
 * Compléments
 

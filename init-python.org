@@ -4,59 +4,106 @@
 #+property: header-args:elisp :tangle ~/.emacs.d/elisp/init-python.el
 #+property: header-args:      :results silent  :eval no-export  :comments org
 
-On peut lire avec intérêt [[https://github.com/howardabrams/dot-files/blob/master/emacs-python.org][emacs-python.org]] d'Howard Abrams, ainsi que [[https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a][Managing a Python development environment in Emacs]].
+On peut lire avec intérêt [[https://github.com/howardabrams/dot-files/blob/master/emacs-python.org][Emacs-python.org]] d'Howard Abrams, ainsi que [[https://medium.com/analytics-vidhya/managing-a-python-development-environment-in-emacs-43897fd48c6a][Managing a Python development environment in Emacs]]. La documentation d'[[https://github.com/jorgenschaefer/elpy][Elpy]] suggère aussi [[https://east.fm/posts/configuring-gnu-emacs-with-elpy-on-macos/index.html][Configuring Emacs with elpy on MacOs]].
 
-#+begin_src elisp
-  (use-package elpy
-    :straight t
-    :init
-    (elpy-enable)
-    ;; (setq python-shell-interpreter "jupyter-console"
-    ;; 	python-shell-interpreter-args "--simple-prompt"
-    ;; 	python-shell-prompt-detect-failure-warning nil)
-    ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
-    ;; 	       "jupyter-console")
-    ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
-    ;; 	       "jupyter")
-    :custom
-    (elpy-shell-codecell-beginning-regexp (concat "^\\(?:"
-						  "##.*"
-						  "\\|"
-						  "#\\s-*<codecell>"
-						  "\\|"
-						  "#\\s-*In\\[.*\\]:"
-						  "\\|"
-						  "#\\s-*%%"
-						  "\\)\\s-*$") "")
-    (elpy-shell-cell-boundary-regexp (concat "^\\(?:"
-					     "##.*" "\\|"
-					     "#\\s-*<.+>" "\\|"
-					     "#\\s-*\\(?:In\\|Out\\)\\[.*\\]:"
-					     "\\|"
-					     "#\\s-*%%"
-					     "\\)\\s-*$") "")
-    :hook (
-	   (elpy-mode . flycheck-mode)
-	   ;; (pyenv-mode . elpy-rpc-restart)
-	   )
-    :config
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules)))
+Concernant la délicate gestion de Python, [[https://github.com/pyenv/pyenv][Pyenv]] et [[https://github.com/pyenv/pyenv-virtualenv][Pyenv-Virtualenv]] semblent la clé, avec des indications pour utiliser [[https://github.com/fish-shell/fish-shell][fish]].
 
-  (use-package blacken
-    :straight t
-    :hook (python-mode . blacken-mode)
-    :config (setq blacken-line-length '80)
-    :bind (:map python-mode-map ([remap indent-region] . blacken)))
+** pyenv
 
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  ;; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
-  (setq elpy-shell-echo-output nil)
-  (setq elpy-rpc-python-command "python3")
-  (setq elpy-rpc-timeout 2)
+   Le [[https://github.com/pythonic-emacs/pyenv-mode][pyenv-mode]] permet de spécifier l'environnement de base (ici =3.8.2=), et le code supplémentaire, pioché sur le site du mode via Howard Abrams, détecte un environnement dépendant du projet en cours.
 
-  ;; (use-package jupyter :straight t)
-#+end_src
+   #+begin_src elisp
+     (use-package pyenv-mode
+       :straight t
+       :config
+       (pyenv-mode-set "3.8.2")
 
-#+begin_src elisp
-  (provide 'init-python)
-#+end_src
+       (defun projectile-pyenv-mode-set ()
+	 "Set pyenv version matching project name."
+	 (let ((project (projectile-project-name)))
+	   (if (member project (pyenv-mode-versions))
+	       (pyenv-mode-set project)
+	     (pyenv-mode-unset))))
+
+       (add-hook 'projectile-switch-project-hook 'projectile-pyenv-mode-set)
+       (add-hook 'python-mode-hook 'pyenv-mode)
+       )
+   #+end_src
+
+   Le package [[https://github.com/ssbb/pyenv-mode-auto][pyenv-mode-auto]] détermine l'environnement à partir d'un fichier =.python-version= s'il existe. Mais essai peu convaincant pour l'instant.
+
+** Python
+
+   Pas de tabulations.
+
+   #+begin_src elisp
+     (use-package python
+       :init
+       (setq indent-tabs-mode nil)
+       (setq python-indent-offset 4)
+       )
+   #+end_src
+
+   # #+begin_src elisp
+   #   (use-package pyenv-mode-auto :straight t)
+   # #+end_src
+
+   #+begin_src elisp
+     (use-package elpy
+       :straight t
+       :init
+       (elpy-enable)
+       ;; (setq python-shell-interpreter "jupyter-console"
+       ;; 	python-shell-interpreter-args "--simple-prompt"
+       ;; 	python-shell-prompt-detect-failure-warning nil)
+       ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+       ;; 	       "jupyter-console")
+       ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+       ;; 	       "jupyter")
+       :custom
+       (elpy-shell-codecell-beginning-regexp (concat "^\\(?:"
+						     "##.*"
+						     "\\|"
+						     "#\\s-*<codecell>"
+						     "\\|"
+						     "#\\s-*In\\[.*\\]:"
+						     "\\|"
+						     "#\\s-*%%"
+						     "\\)\\s-*$") "")
+       (elpy-shell-cell-boundary-regexp (concat "^\\(?:"
+						"##.*" "\\|"
+						"#\\s-*<.+>" "\\|"
+						"#\\s-*\\(?:In\\|Out\\)\\[.*\\]:"
+						"\\|"
+						"#\\s-*%%"
+						"\\)\\s-*$") "")
+       :hook (
+	      (elpy-mode . flycheck-mode)
+	      ;; (pyenv-mode . elpy-rpc-restart)
+	      )
+       :bind (("M-RET" . elpy-shell-send-codecell-and-step))
+(:map python-mode-map ([remap indent-region] . elpy-black-fix-code))
+       :config
+       (delete 'elpy-module-flymake elpy-modules)
+       (setq elpy-rpc-virtualenv-path "~/.pyenv/versions/elpy")
+       (add-hook 'elpy-mode-hook (lambda() (add-hook 'before-save-hook 'elpy-black-fix-code nil t)))
+       )
+
+     ;; (use-package blacken
+     ;;   :straight t
+     ;;   :hook (python-mode . blacken-mode)
+     ;;   :config (setq blacken-line-length '80)
+     ;;   :bind (:map python-mode-map ([remap indent-region] . blacken)))
+
+     ;; (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+     ;; ;; fix for MacOS, see https://github.com/jorgenschaefer/elpy/issues/1550
+     ;; (setq elpy-shell-echo-output nil)
+     ;; (setq elpy-rpc-python-command "python3")
+     ;; (setq elpy-rpc-timeout 2)
+
+     ;; (use-package jupyter :straight t)
+   #+end_src
+
+   #+begin_src elisp
+     (provide 'init-python)
+   #+end_src

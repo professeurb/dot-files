@@ -169,6 +169,8 @@
 
 **** Gestion des fenêtres
 
+     [[https://github.com/abo-abo/ace-window][Ace-Window]] d'Abo-Abo.
+
      #+begin_src elisp
        (use-package ace-window
 	 :straight t
@@ -193,34 +195,6 @@
 	 (defalias 'redo 'undo-tree-redo)
 	 :bind (("C-z" . undo)     ; Zap to character isn't helpful
 		("C-S-z" . redo)))
-     #+end_src
-     
-**** IDO
-
-     Voir [[https://www.masteringemacs.org/article/introduction-to-ido-mode][ici]] pour être convaincu par /Interactive Do Things/.
-
-     #+begin_src elisp
-       (use-package ido
-	 :straight t
-	 :init  (setq ido-enable-flex-matching t
-		      ido-ignore-extensions t
-		      ido-use-virtual-buffers t
-		      ido-everywhere t)
-	 :config
-	 (ido-mode 1)
-	 (ido-everywhere 1)
-	 )
-     #+end_src
-
-     Pour faire marcher IDO verticallement, on peut utiliser [[https://github.com/creichert/ido-vertical-mode.el][ido-vertical-mode]].
- 
-     #+begin_src elisp
-       (use-package ido-vertical-mode
-	 :ensure t
-	 :init               ; I like up and down arrow keys:
-	 (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
-	 :config
-	 (ido-vertical-mode 1))
      #+end_src
 
 **** Expand region
@@ -407,38 +381,48 @@
       (setq frame-title-format nil)
     #+end_src
 
-    #+begin_src elisp
-      (use-package ivy
-	:straight t
-	:diminish (ivy-mode . " Ⅳ")
-	:config
-	(ivy-mode 1)
-	(setq-default
-	 ivy-use-virtual-buffers t
-	 ivy-virtual-abbreviate 'fullpath
-	 ivy-count-format "(%:%)"))
+**** [[https://oremacs.com/swiper/][Swiper]] and co.
 
-      (use-package swiper
-	:straight t
-	:after ivy
-	:bind* (("C-s" . swiper)))
+     J'utilise ça plutôt que Ido et Helm.
 
-      (use-package counsel
-	:straight t
-	:after ivy
-	:bind (
-	       ("M-x" . counsel-M-x)
-	       ("M-y" . counsel-yank-pop)
-	       ("C-x C-f" . counsel-find-file)))
-    #+end_src
+     On peut aussi regarder [[https://writequit.org/denver-emacs/presentations/2017-04-11-ivy.html][ici]].
 
-    The first time, one has to run the command =all-the-icons-install-fonts=.
-    #+begin_src elisp
-      (use-package all-the-icons :straight t)
-      (use-package all-the-icons-ivy
-	:straight t
-	:config (all-the-icons-ivy-setup))
-    #+end_src
+     #+begin_src elisp
+       (use-package ivy
+	 :straight t
+	 :diminish (ivy-mode . " Ⅳ")
+	 :config
+	 (ivy-mode 1)
+	 (setq-default
+	  ivy-use-virtual-buffers t
+	  ivy-virtual-abbreviate 'fullpath
+	  ivy-count-format "(%:%)"))
+
+       (use-package swiper
+	 :straight t
+	 :after ivy
+	 :bind* (("C-s" . swiper-isearch)))
+
+       (use-package counsel
+	 :straight t
+	 :after ivy
+	 :bind (
+		("M-x" . counsel-M-x)
+		("M-y" . counsel-yank-pop)
+		("C-x C-f" . counsel-find-file)))
+     #+end_src
+
+**** Idées à explorer
+     
+     * [[https://github.com/tumashu/ivy-posframe][Ivy-Postframe]]
+
+     The first time, one has to run the command =all-the-icons-install-fonts=.
+     #+begin_src elisp
+       (use-package all-the-icons :straight t)
+       (use-package all-the-icons-ivy
+	 :straight t
+	 :config (all-the-icons-ivy-setup))
+     #+end_src
 
 ** Programming
 
@@ -454,6 +438,7 @@
 *** Language specifics
     
 **** Python
+
      #+begin_src elisp
        (require 'init-python)
      #+end_src
