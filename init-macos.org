@@ -11,8 +11,8 @@ Comme souvent, on part de [[https://github.com/howardabrams/dot-files/blob/maste
   Je laisse la touche =option= inchangée car elle est nécessaire pour certains caractères avec le clavier français.
 
   #+begin_src elisp
-    (setq mac-option-modifier 'none)
-    (setq mac-command-modifier 'meta)
+;;    (setq mac-option-modifier 'none)
+;;    (setq mac-command-modifier 'meta)
   #+end_src
 
 * Réglage des différents chemins

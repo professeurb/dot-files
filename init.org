@@ -1,6 +1,7 @@
 #+title: Professeur B's configuration
-#+options: toc:4 h:4
+#+options: toc:0 h:4
 #+startup: showeverything
+#+startup: noindent
 #+property: header-args:elisp :tangle "~/.emacs.d/init.el"
 #+property: header-args: :results silent :eval no-export :comments org
 
@@ -41,7 +42,8 @@
     (setq inhibit-startup-screen t)
     (setq initial-scratch-message nil)
     (setq visible-bell t)
-
+    ;; Navigate windows with shift-arrows
+    (windmove-default-keybindings)
     ;; Line truncation
     (setq-default truncate-lines nil)
 
@@ -135,37 +137,44 @@
     #+begin_src elisp
       (require 'init-macos)
     #+end_src
-    * [[https://github.com/myrjola/diminish.el][diminish]] provides lighter displays of minor-modes.
-      #+begin_src elisp
-	(use-package diminish :straight t)
-      #+end_src
-    - [[https://github.com/justbur/emacs-which-key][whick-key]] makes it easier to discover Emacs key presses. 
-      #+begin_src elisp
-	(use-package which-key
-	  :straight t
-	  :diminish which-key-mode
-	  :config
-	  (setq which-key-separator " ")
-	  (setq which-key-prefix-prefix "+")
-	  (setq which-key-idle-delay 0.05)
-	  (which-key-setup-side-window-bottom)
-	  (which-key-mode)
-	  )
-	;; Recent Files
-	;; (use-package recentf
-	;;   :straight t
-	;;   :config
-	;;   (setq recentf-auto-cleanup 'never) ;; prevent issues with Tramp
-	;;   (setq recentf-max-saved-items 100)
-	;;   (setq recentf-max-menu-items 15)
-	;;   (recentf-mode t))
-	(use-package hydra
-	  :straight (:host github :repo "abo-abo/hydra"))
-	(use-package major-mode-hydra
-	  :straight t
-	  :bind
-	  ("M-SPC" . major-mode-hydra))
-      #+end_src
+    - dashboard
+    #+begin_src elisp
+      (use-package dashboard
+	:straight t
+	:config
+	(dashboard-setup-startup-hook))
+    #+end_src
+* [[https://github.com/myrjola/diminish.el][diminish]] provides lighter displays of minor-modes.
+  #+begin_src elisp
+    (use-package diminish :straight t)
+  #+end_src
+  - [[https://github.com/justbur/emacs-which-key][whick-key]] makes it easier to discover Emacs key presses. 
+    #+begin_src elisp
+      (use-package which-key
+	:straight t
+	:diminish which-key-mode
+	:config
+	(setq which-key-separator " ")
+	(setq which-key-prefix-prefix "+")
+	(setq which-key-idle-delay 0.05)
+	(which-key-setup-side-window-bottom)
+	(which-key-mode)
+	)
+      ;; Recent Files
+      ;; (use-package recentf
+      ;;   :straight t
+      ;;   :config
+      ;;   (setq recentf-auto-cleanup 'never) ;; prevent issues with Tramp
+      ;;   (setq recentf-max-saved-items 100)
+      ;;   (setq recentf-max-menu-items 15)
+      ;;   (recentf-mode t))
+      (use-package hydra
+	:straight (:host github :repo "abo-abo/hydra"))
+      (use-package major-mode-hydra
+	:straight t
+	:bind
+	("M-SPC" . major-mode-hydra))
+    #+end_src
 
 **** Gestion des fenêtres
 
@@ -198,7 +207,6 @@
      #+end_src
 
 **** Expand region
-
      Piqué à [[https://github.com/howardabrams/dot-files/blob/master/emacs.org][Howard Abrams]], comme tellement de choses.
 
      #+begin_src elisp
@@ -236,26 +244,26 @@
 
     - [[https://emacs-lsp.github.io/lsp-mode/lsp-mode.html][Documentation]]
 
-    # #+begin_src elisp
-    #   (setq lsp-keymap-prefix "C-l")
-    #   (use-package lsp-mode
-    # 	:straight t
-    # 	:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
-    # 	       ;; (ocaml-mode . lsp-deferred)
-    # 	       ;; (python-mode . lsp-deferred)
-    # 	       ;; if you want which-key integration
-    # 	       (lsp-mode . lsp-enable-which-key-integration))
-    # 	:commands lsp)
+      # #+begin_src elisp
+      #   (setq lsp-keymap-prefix "C-l")
+      #   (use-package lsp-mode
+      # 	:straight t
+      # 	:hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+      # 	       ;; (ocaml-mode . lsp-deferred)
+      # 	       ;; (python-mode . lsp-deferred)
+      # 	       ;; if you want which-key integration
+      # 	       (lsp-mode . lsp-enable-which-key-integration))
+      # 	:commands lsp)
 
-    #   ;; optionally
-    #   (use-package lsp-ui :straight t :commands lsp-ui-mode)
-    #   (use-package company-lsp :straight t :commands company-lsp)
-    #   ;; if you are helm user
-    #   ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-    #   ;; if you are ivy user
-    #   (use-package lsp-ivy :straight t :commands lsp-ivy-workspace-symbol)
-    #   ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-    # #+end_src
+      #   ;; optionally
+      #   (use-package lsp-ui :straight t :commands lsp-ui-mode)
+      #   (use-package company-lsp :straight t :commands company-lsp)
+      #   ;; if you are helm user
+      #   ;; (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+      #   ;; if you are ivy user
+      #   (use-package lsp-ivy :straight t :commands lsp-ivy-workspace-symbol)
+      #   ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+      # #+end_src
 
 *** Auto-completion with [[http://company-mode.github.io][company]]
 
@@ -314,32 +322,32 @@
     - [[https://github.com/linktohack/evil-commentary/][evil-commentary]] which helps commenting out things (=gcc= comments a line, =gc= comments out the target motion),
     - [[https://github.com/TheBB/evil-indent-plus/][evil-indent-plus]] adds textobjects based on indentation, =i= corresponding to same or higher indentation, =I= to include the first line with less indentation and =J= to also include an extra line below,
 
-    It might be interesting to take a look at:
-    - [[https://github.com/emacs-evil/evil-collection/][evil-collection]]
-    - [[https://github.com/cofi/evil-leader/tree/39f7014bcf8b36463e0c7512c638bda4bac6c2cf][evil-leader]]
+      It might be interesting to take a look at:
+      - [[https://github.com/emacs-evil/evil-collection/][evil-collection]]
+      - [[https://github.com/cofi/evil-leader/tree/39f7014bcf8b36463e0c7512c638bda4bac6c2cf][evil-leader]]
 
-    Now, let's define some hydras
+	Now, let's define some hydras
 
-    #+begin_src elisp
-      (pretty-hydra-define mydra-buffer () ("Buffers"
-					    ( ("b" list-buffers "list")
-					      ("k" kill-buffer "kill")
-					      )))
+	#+begin_src elisp
+	  (pretty-hydra-define mydra-buffer () ("Buffers"
+						( ("b" list-buffers "list")
+						  ("k" kill-buffer "kill")
+						  )))
 
-      (evil-leader/set-key "b" 'mydra-buffer/body)
-      (which-key-add-key-based-replacements
-	"SPC b" "Buffers")
+	  (evil-leader/set-key "b" 'mydra-buffer/body)
+	  (which-key-add-key-based-replacements
+	    "SPC b" "Buffers")
 
-      (pretty-hydra-define mydra-win ()
-	(
-	 "Actions" (("w" other-window "switch")("c" delete-window "close"))
-	 "Split" (("s" split-window-right "horizontally")
-		  ("v" split-window-below "vertically"))))
+	  (pretty-hydra-define mydra-win ()
+	    (
+	     "Actions" (("w" other-window "switch")("c" delete-window "close"))
+	     "Split" (("s" split-window-right "horizontally")
+		      ("v" split-window-below "vertically"))))
 
-      (evil-leader/set-key "w" 'mydra-win/body)
-      (which-key-add-key-based-replacements
-	"SPC w" "Windows")
-    #+end_src
+	  (evil-leader/set-key "w" 'mydra-win/body)
+	  (which-key-add-key-based-replacements
+	    "SPC w" "Windows")
+	#+end_src
 
 *** Themes
 
@@ -409,31 +417,33 @@
 	 :bind (
 		("M-x" . counsel-M-x)
 		("M-y" . counsel-yank-pop)
-		("C-x C-f" . counsel-find-file)))
+		("C-x C-f" . counsel-find-file)
+("C-x b" 'ivy-switch-buffer)
+("C-x n" 'counsel-fzf)))
      #+end_src
 
 **** Idées à explorer
      
-     * [[https://github.com/tumashu/ivy-posframe][Ivy-Postframe]]
+* [[https://github.com/tumashu/ivy-posframe][Ivy-Postframe]]
 
-     The first time, one has to run the command =all-the-icons-install-fonts=.
-     #+begin_src elisp
-       (use-package all-the-icons :straight t)
-       (use-package all-the-icons-ivy
-	 :straight t
-	 :config (all-the-icons-ivy-setup))
-     #+end_src
+  The first time, one has to run the command =all-the-icons-install-fonts=.
+  #+begin_src elisp
+    (use-package all-the-icons :straight t)
+    (use-package all-the-icons-ivy
+      :straight t
+      :config (all-the-icons-ivy-setup))
+  #+end_src
 
 ** Programming
 
 *** General packages
 
     - [[https://www.flycheck.org][Flycheck]] syntax checker
-    #+begin_src elisp
-      (use-package flycheck
-	:straight t
-	:init (global-flycheck-mode))
-    #+end_src
+      #+begin_src elisp
+	(use-package flycheck
+	  :straight t
+	  :init (global-flycheck-mode))
+      #+end_src
 
 *** Language specifics
     
@@ -457,9 +467,20 @@
 	 :hook (tuareg-mode . (lambda ()
 				(add-hook 'before-save-hook #'ocamlformat-before-save nil 't)))
 	 :custom (ocamlformat-show-errors nil))
+
        (use-package tuareg
+	 :straight t
 	 :defines tuareg-mode-map
-	 :bind (:map tuareg-mode-map ([remap indent-region] . ocamlformat)))
+	 :bind (:map tuareg-mode-map ([remap indent-region] . ocamlformat))
+	 )
+
+       (use-package reformatter
+	 :straight (:host github :repo "purcell/reformatter.el" :files ("reformatter.el")))
+       (use-package ocamlreformat
+	 :straight (:host github :repo "ludwigpacifici/ocamlreformat.el" :files ("ocamlreformat.el"))
+	 :config
+	 (setq ocamlreformat-file-kind 'implementation)
+	 )
 
        ;; (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
      #+end_src
@@ -485,6 +506,7 @@
 	;; (ox-extras-activate '(ignore-headlines))
 	)
 
+      (use-package org-preview-html :straight t)
       (setq org-src-fontify-natively t)
       (use-package htmlize
 	:straight t)

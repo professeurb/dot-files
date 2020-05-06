@@ -44,9 +44,9 @@ Concernant la délicate gestion de Python, [[https://github.com/pyenv/pyenv][Pye
        )
    #+end_src
 
-   # #+begin_src elisp
-   #   (use-package pyenv-mode-auto :straight t)
-   # #+end_src
+** Elpy
+
+   Voici maintenant le gros morceau.
 
    #+begin_src elisp
      (use-package elpy
@@ -81,8 +81,8 @@ Concernant la délicate gestion de Python, [[https://github.com/pyenv/pyenv][Pye
 	      (elpy-mode . flycheck-mode)
 	      ;; (pyenv-mode . elpy-rpc-restart)
 	      )
-       :bind (("M-RET" . elpy-shell-send-codecell-and-step))
-(:map python-mode-map ([remap indent-region] . elpy-black-fix-code))
+       :bind (("M-RET" . elpy-shell-send-codecell-and-step)
+	      :map python-mode-map ([remap indent-region] . elpy-black-fix-code))
        :config
        (delete 'elpy-module-flymake elpy-modules)
        (setq elpy-rpc-virtualenv-path "~/.pyenv/versions/elpy")
