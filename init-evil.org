@@ -11,11 +11,29 @@ Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-
   Un bon point de départ est [[https://blog.aaronbieber.com/2016/01/23/living-in-evil.html][Living in Evil]] qui explique comment utiliser le meilleur de Vi et d'Emacs grâce à Evil. On peut aussi lire ce [[https://github.com/noctuid/evil-guide][guide]] très très complet.
 
   #+begin_src elisp
+    (use-package evil-leader
+      :straight t
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      :config
+      (global-evil-leader-mode)
+      (evil-leader/set-leader "<SPC>"))
+
     (use-package evil
       :straight t
       :config
       (evil-mode 1)
       )
+  #+end_src
+  
+  [[https://github.com/emacs-evil/evil-collection][evil-Collection]] définit un certain nombre de /keybindings/.
+
+  #+begin_src elisp
+    (use-package evil-collection
+      :straight t
+      :after evil
+      :config (evil-collection-init))    
   #+end_src
 
 * Compléments
@@ -33,7 +51,7 @@ Très inspiré de [[https://github.com/howardabrams/dot-files/blob/master/emacs-
        (setq-default evil-escape-key-sequence "jk")
        (setq-default evil-escape-unordered-key-sequence t))
    #+end_src
-   
+
 ** Goggles
 
    Le mode [[https://github.com/edkolev/evil-goggles][evil-goggles]] donne un aperçu des manipulations en evil.

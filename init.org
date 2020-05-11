@@ -297,12 +297,6 @@
 *** Evil mode
 
     #+begin_src elisp
-      (use-package evil-leader
-	:straight t
-	:config
-	(global-evil-leader-mode)
-	(evil-leader/set-leader "<SPC>"))
-
       (require 'init-evil)
     #+end_src
 
@@ -316,7 +310,8 @@
       (use-package evil-indent-plus
 	:straight t
 	:after evil)
-    #+end_src
+#+end_src
+    
 
     What do we have here?
     - [[https://github.com/linktohack/evil-commentary/][evil-commentary]] which helps commenting out things (=gcc= comments a line, =gc= comments out the target motion),
@@ -418,8 +413,8 @@
 		("M-x" . counsel-M-x)
 		("M-y" . counsel-yank-pop)
 		("C-x C-f" . counsel-find-file)
-("C-x b" 'ivy-switch-buffer)
-("C-x n" 'counsel-fzf)))
+		("C-x b" . 'ivy-switch-buffer)
+		("C-x n" . 'counsel-fzf)))
      #+end_src
 
 **** Idées à explorer
@@ -517,10 +512,16 @@
 	 (python . t)
 	 (ocaml . t)
 	 )
+
        )
       (setq org-latex-listings 'minted
 	    org-latex-packages-alist '(("" "minted")))
       (setq org-latex-pdf-process (list "latexmk -pdflatex='%latex -shell-escape -interaction nonstopmode' -pdf -output-directory=%o %f"))
       ;; (setq org-latex-pdf-process
       ;; '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+    #+end_src
+    On peut s'inspirer des articles d'Aaron Bieber, comme [[https://blog.aaronbieber.com/2016/09/24/an-agenda-for-life-with-org-mode.html][ici]]
+
+    #+begin_src elisp
+      (setq org-agenda-files '("~/Dropbox/org/"))
     #+end_src
